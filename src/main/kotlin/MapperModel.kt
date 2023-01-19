@@ -1,35 +1,52 @@
 import kotlin.reflect.KClass
 import kotlin.reflect.KMutableProperty
-import kotlin.reflect.full.createInstance
-import kotlin.reflect.full.declaredMemberProperties
-import kotlin.reflect.full.findAnnotation
+import kotlin.reflect.KType
+import kotlin.reflect.full.*
+import kotlin.reflect.javaType
 
 class MapperModel {
 
+    //TODO Create Argument Converter for each of the fields.
     fun <T : Any> map(to: Any, cls: KClass<T>): T  {
 
-        val newObject = cls.createInstance()
+        val emptyConstructor: Boolean? = cls.primaryConstructor?.parameters?.isEmpty()
+
+        var newObject: T? = null
         val mapOfProps = mutableMapOf<String?, Any?>()
 
         to::class.declaredMemberProperties
             .forEach {m ->
-
-                val ann = m.findAnnotation<MapperModelField>()
-                val nameToPut = ann?.destinationField ?: m.name
+                val ann = m.findAnnotations<MapperModelField>().filter { ann -> ann.destinationClass == cls.simpleName }.first()
+                val nameToPut = ann?.destinationField
                 mapOfProps[nameToPut] = m.getter.call(to)
 
             }
 
-        cls.declaredMemberProperties.forEach{
-            m ->
-                // If is val, then it replaces via reflection.
-                if(m is KMutableProperty<*>){
-                    m.setter.call(newObject, mapOfProps[m.name])
-                }
+        if(emptyConstructor == true){
+            newObject = cls.createInstance()
+        } else {
+
+            //TODO Do conversion of fields before putting them on the map.
+            val args = cls.primaryConstructor?.parameters?.map { param -> convert(mapOfProps[param.name]!!, param.type)}?.toTypedArray()
+                .orEmpty()
+
+            newObject = cls.primaryConstructor?.call(*args)
         }
 
-        println("New Object: $newObject")
+        cls.declaredMemberProperties.forEach{
+            m ->
+                    if (m is KMutableProperty<*>) {
+                        m.setter.call(newObject, convert(mapOfProps[m.name]!!, m.returnType))
+                    }
+        }
 
-        return newObject
+        return newObject!!
+    }
+
+    fun convert(from: Any, to: KType): Any {
+        val typeClassifier = from::class.createType().classifier
+        val toClassifier = to.classifier
+        val converters = Converters()
+        return converters.getConverter(typeClassifier, toClassifier)?.invoke(from)!!
     }
 }

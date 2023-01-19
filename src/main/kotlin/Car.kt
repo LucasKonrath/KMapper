@@ -1,5 +1,7 @@
 data class Car(
-    @property:MapperModelField(destinationField = "nome")
+    @property:MapperModelField(destinationField = "nome", destinationClass = "Carro")
+    @property:MapperModelField(destinationField = "id", destinationClass = "EmptyCar")
     var name: String? = null,
-    @property:MapperModelField(destinationField = "cavalos")
-    var hp: Int? = null)
+    @property:MapperModelField(destinationField = "cavalos", destinationClass = "Carro")
+    @property:MapperModelField(destinationField = "cavalin", destinationClass = "EmptyCar")
+    val hp: Int)
