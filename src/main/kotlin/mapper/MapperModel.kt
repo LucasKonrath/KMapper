@@ -7,7 +7,7 @@ import kotlin.reflect.full.*
 
 class MapperModel {
 
-    fun <T : Any> map(to: Any, cls: KClass<T>): T  {
+    fun <T : Any> map(to: Any, cls: KClass<T>): T {
 
         val emptyConstructor: Boolean? = cls.primaryConstructor?.parameters?.isEmpty()
 
@@ -15,29 +15,33 @@ class MapperModel {
         val mapOfProps = mutableMapOf<String?, Any?>()
 
         to::class.declaredMemberProperties
-            .forEach {m ->
-                val ann = m.findAnnotations<MapperModelField>().filter { ann -> ann.destinationClass == cls.simpleName }.first()
-                val nameToPut = ann?.destinationField
+            .forEach { m ->
+                val ann = m.findAnnotations<MapperModelField>().filter { ann -> ann.destinationClass == cls.simpleName }
+                    .first()
+                val nameToPut = ann.destinationField
                 mapOfProps[nameToPut] = m.getter.call(to)
 
             }
 
-        if(emptyConstructor == true){
+        if (emptyConstructor == true) {
             newObject = cls.createInstance()
         } else {
 
-            //TODO Do conversion of fields before putting them on the map.
-            val args = cls.primaryConstructor?.parameters?.map { param -> convert(mapOfProps[param.name]!!, param.type)}?.toTypedArray()
-                .orEmpty()
+            val args =
+                cls.primaryConstructor?.parameters?.map { param -> convert(mapOfProps[param.name]!!, param.type) }
+                    ?.toTypedArray()
+                    .orEmpty()
 
             newObject = cls.primaryConstructor?.call(*args)
         }
 
-        cls.declaredMemberProperties.forEach{
-            m ->
-                    if (m is KMutableProperty<*>) {
-                        m.setter.call(newObject, convert(mapOfProps[m.name]!!, m.returnType))
-                    }
+        cls.declaredMemberProperties.forEach { m ->
+            if (m is KMutableProperty<*>) {
+                m.setter.call(
+                    newObject,
+                    convert(mapOfProps[m.name]!!, m.returnType)
+                )
+            }
         }
 
         return newObject!!
