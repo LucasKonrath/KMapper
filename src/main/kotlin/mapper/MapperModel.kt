@@ -16,9 +16,10 @@ class MapperModel {
 
         to::class.declaredMemberProperties
             .forEach { m ->
-                val ann = m.findAnnotations<MapperModelField>().filter { ann -> ann.destinationClass == cls.simpleName }
-                    .first()
-                val nameToPut = ann.destinationField
+                val ann: MapperModelField? =
+                    m.findAnnotations<MapperModelField>()
+                        .firstOrNull { ann -> ann.destinationClass == cls.simpleName }
+                val nameToPut = ann?.destinationField ?: m.name
                 mapOfProps[nameToPut] = m.getter.call(to)
 
             }
@@ -47,7 +48,7 @@ class MapperModel {
         return newObject!!
     }
 
-    fun convert(from: Any, to: KType): Any {
+    private fun convert(from: Any, to: KType): Any {
         val typeClassifier = from::class.createType().classifier
         val toClassifier = to.classifier
         val converters = Converters()

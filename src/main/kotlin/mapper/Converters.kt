@@ -6,12 +6,20 @@ class Converters {
 
     val converters: MutableMap<Pair<KClassifier?, KClassifier?>, ((Any) -> Any)> = mutableMapOf()
 
+    /**
+     * All KTypes:
+     *  Number -> Byte, Short, Int, Long, Float, Double
+     *  Boolean
+     *  Char
+     *  String
+     *  Array -> Array<T>, ByteArray, ShortArray, IntArray
+     */
     init {
 
         converters[Pair(String::class, String::class)] = { from ->
             from
         }
-        
+
         converters[Pair(String::class, Int::class)] = { from ->
             from as String
             from.toInt()
