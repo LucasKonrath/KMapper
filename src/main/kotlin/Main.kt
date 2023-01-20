@@ -1,8 +1,7 @@
-import java.util.Objects
-import kotlin.reflect.KMutableProperty
-import kotlin.reflect.full.declaredMemberProperties
-import kotlin.reflect.jvm.internal.impl.load.kotlin.JvmType
-import kotlin.reflect.jvm.internal.impl.resolve.scopes.MemberScope.Empty
+import mock.data.Car
+import mock.data.Carro
+import mock.data.EmptyCar
+import mapper.MapperModel
 
 fun main(args: Array<String>) {
     println("Hello World!")

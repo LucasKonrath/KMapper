@@ -1,3 +1,7 @@
+package mock.data
+
+import mapper.MapperModelField
+
 data class Car(
     @property:MapperModelField(destinationField = "nome", destinationClass = "Carro")
     @property:MapperModelField(destinationField = "id", destinationClass = "EmptyCar")

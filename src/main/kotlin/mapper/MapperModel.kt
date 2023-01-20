@@ -1,12 +1,12 @@
+package mapper
+
 import kotlin.reflect.KClass
 import kotlin.reflect.KMutableProperty
 import kotlin.reflect.KType
 import kotlin.reflect.full.*
-import kotlin.reflect.javaType
 
 class MapperModel {
 
-    //TODO Create Argument Converter for each of the fields.
     fun <T : Any> map(to: Any, cls: KClass<T>): T  {
 
         val emptyConstructor: Boolean? = cls.primaryConstructor?.parameters?.isEmpty()
