@@ -7,6 +7,17 @@ import kotlin.reflect.full.*
 
 class MapperModel {
 
+    /**
+     * Function called to convert an instance of an object to an instance of the specified KClass.
+     * It'll get the origin class, insert all of its member properties onto a map with their corresponding name
+     * (if MapperModelField is present, it'll get the destinationField value, else it'll get the property name).
+     * Then the method will instantiate the destination object with the biggest constructor available, and will populate
+     * the object with the values from the original object. The remaining member properties will be set via Reflection.
+     *
+     * For inserting each value on the destination class, a Converter is used. Converters are used to convert between
+     * two data types, and they are registered on the Converters.kt file. If you wish to expand the current converters,
+     * or create custom ones, you can add them on that file.
+     */
     fun <T : Any> map(to: Any, cls: KClass<T>): T {
 
         val emptyConstructor: Boolean? = cls.primaryConstructor?.parameters?.isEmpty()

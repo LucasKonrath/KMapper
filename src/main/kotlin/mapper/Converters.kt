@@ -4,7 +4,7 @@ import kotlin.reflect.KClassifier
 
 class Converters {
 
-    val converters: MutableMap<Pair<KClassifier?, KClassifier?>, ((Any) -> Any)> = mutableMapOf()
+    private val converters: MutableMap<Pair<KClassifier?, KClassifier?>, ((Any) -> Any)> = mutableMapOf()
 
     /**
      * All KTypes:
@@ -41,6 +41,9 @@ class Converters {
         }
     }
 
+    /**
+     * Returns the converter to be used for converting between two Kotlin classes on the MapperModel class.
+     */
     fun getConverter(type1: KClassifier?, type2: KClassifier?) = converters[Pair(type1, type2)]
 
 }
