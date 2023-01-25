@@ -1,44 +1,45 @@
-import mapper.converters.Converters
+package org.kmapper.converters
+
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
-class DoubleConvertersTest {
+class ShortConvertersTest {
 
     private val converters = Converters()
 
     @Test
-    fun convertDoubleToString() {
-        val from = 10.0
+    fun convertShortToString() {
+        val from = 0XE0.toShort()
         val to: Any = converters.getConverter(from::class, String::class)?.invoke(from)!!
         Assertions.assertEquals(from.toString(), to)
     }
 
     @Test
-    fun convertDoubleToInt() {
-        val from = 10.0
+    fun convertShortToInt() {
+        val from = 0XE0.toShort()
         val to: Any = converters.getConverter(from::class, Int::class)?.invoke(from)!!
         Assertions.assertEquals(from.toInt(), to)
     }
 
     @Test
-    fun convertDoubleToDouble() {
-        val from = 10.0
+    fun convertShortToDouble() {
+        val from = 0XE0.toShort()
         val to: Any = converters.getConverter(from::class, Double::class)?.invoke(from)!!
-        Assertions.assertEquals(from, to)
+        Assertions.assertEquals(from.toDouble(), to)
     }
 
     @Test
-    fun convertDoubleToByte() {
-        val from = 10.0
+    fun convertShortToByte() {
+        val from = 0XE0.toShort()
         val to: Any = converters.getConverter(from::class, Byte::class)?.invoke(from)!!
-        Assertions.assertEquals(from.toInt().toByte(), to)
+        Assertions.assertEquals(from.toByte(), to)
     }
 
     @Test
-    fun convertDoubleToShort() {
-        val from = 10.0
+    fun convertShortToShort() {
+        val from = 0XE0.toShort()
         val to: Any = converters.getConverter(from::class, Short::class)?.invoke(from)!!
-        Assertions.assertEquals(from.toInt().toShort(), to)
+        Assertions.assertEquals(from, to)
     }
 
 }

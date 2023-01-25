@@ -1,5 +1,5 @@
-import mapper.MapperModel
-import mapper.MapperModelField
+package org.kmapper
+
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 

@@ -1,4 +1,4 @@
-package mapper.converters
+package org.kmapper.converters
 
 import kotlin.reflect.KClassifier
 

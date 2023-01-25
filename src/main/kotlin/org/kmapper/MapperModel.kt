@@ -1,6 +1,6 @@
-package mapper
+package org.kmapper
 
-import mapper.converters.Converters
+import org.kmapper.converters.Converters
 import kotlin.reflect.KClass
 import kotlin.reflect.KMutableProperty
 import kotlin.reflect.KType

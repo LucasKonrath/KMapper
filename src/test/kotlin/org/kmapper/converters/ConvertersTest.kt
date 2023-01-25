@@ -1,4 +1,5 @@
-import mapper.converters.Converters
+package org.kmapper.converters
+
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
@@ -24,5 +25,5 @@ class ConvertersTest {
     enum class TestConversionEnum() {
         TEST_VALUE
     }
-    
+
 }
