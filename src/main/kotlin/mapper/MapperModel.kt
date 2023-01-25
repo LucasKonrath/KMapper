@@ -1,11 +1,14 @@
 package mapper
 
+import mapper.converters.Converters
 import kotlin.reflect.KClass
 import kotlin.reflect.KMutableProperty
 import kotlin.reflect.KType
 import kotlin.reflect.full.*
 
 class MapperModel {
+
+    val converters = Converters()
 
     /**
      * Function called to convert an instance of an object to an instance of the specified KClass.
@@ -62,7 +65,6 @@ class MapperModel {
     private fun convert(from: Any, to: KType): Any {
         val typeClassifier = from::class.createType().classifier
         val toClassifier = to.classifier
-        val converters = Converters()
         return converters.getConverter(typeClassifier, toClassifier)?.invoke(from)!!
     }
 }

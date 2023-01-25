@@ -1,4 +1,4 @@
-import mapper.Converters
+import mapper.converters.Converters
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
@@ -7,37 +7,22 @@ class ConvertersTest {
     private val converters = Converters()
 
     @Test
-    fun convertStringToString() {
-        val from = "Test"
-        val to: Any = converters.getConverter(from::class, String::class)?.invoke(from)!!
-        Assertions.assertEquals(from, to)
+    fun testCustomConversion() {
+        val from = "TEST_VALUE"
+
+        converters.addConverter(String::class, TestConversionEnum::class) { from ->
+            from as String
+            TestConversionEnum.valueOf(from)
+        }
+
+        val to = converters.getConverter(String::class, TestConversionEnum::class)?.invoke(from)!!
+
+        Assertions.assertEquals(TestConversionEnum.TEST_VALUE, to)
+
     }
 
-    @Test
-    fun convertStringToInt() {
-        val from = "10"
-        val to: Any = converters.getConverter(from::class, Int::class)?.invoke(from)!!
-        Assertions.assertEquals(from.toInt(), to)
+    enum class TestConversionEnum() {
+        TEST_VALUE
     }
-
-    @Test
-    fun convertStringToDouble() {
-        val from = "10.0"
-        val to: Any = converters.getConverter(from::class, Double::class)?.invoke(from)!!
-        Assertions.assertEquals(from.toDouble(), to)
-    }
-
-    @Test
-    fun convertIntToInt() {
-        val from = 10
-        val to: Any = converters.getConverter(from::class, Int::class)?.invoke(from)!!
-        Assertions.assertEquals(from, to)
-    }
-
-    @Test
-    fun convertIntToDouble() {
-        val from = 10
-        val to: Any = converters.getConverter(from::class, Double::class)?.invoke(from)!!
-        Assertions.assertEquals(from.toDouble(), to)
-    }
+    
 }
