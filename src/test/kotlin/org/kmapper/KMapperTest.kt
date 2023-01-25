@@ -3,14 +3,14 @@ package org.kmapper
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
-class MapperModelTest {
+class KMapperTest {
 
-    private val mapperModel = MapperModel()
+    private val kMapper = KMapper()
 
     @Test
     fun testMappingEmptyConstructorWithoutAnnotations() {
         val origin = getMock()
-        val emptyConstructorClass = mapperModel.map(origin, EmptyConstructorClass::class)
+        val emptyConstructorClass = kMapper.map(origin, EmptyConstructorClass::class)
 
         assertEquals(origin.testString, emptyConstructorClass.testString)
         assertEquals(origin.testInt, emptyConstructorClass.testInt)
@@ -19,7 +19,7 @@ class MapperModelTest {
     @Test
     fun testMappingEmptyConstructorWithAnnotations() {
         val origin = getMockAnnotated()
-        val emptyConstructorClass = mapperModel.map(origin, EmptyConstructorClass::class)
+        val emptyConstructorClass = kMapper.map(origin, EmptyConstructorClass::class)
         assertEquals(origin.string, emptyConstructorClass.testString)
         assertEquals(origin.int, emptyConstructorClass.testInt)
     }
@@ -27,7 +27,7 @@ class MapperModelTest {
     @Test
     fun testMappingFullConstructorWithoutAnnotations() {
         val origin = OriginalClass(testString = "Test String", testInt = 4444)
-        val destination = mapperModel.map(origin, DestinationRecordClass::class)
+        val destination = kMapper.map(origin, DestinationRecordClass::class)
 
         assertEquals(origin.testString, destination.testString)
         assertEquals(origin.testInt, destination.testInt)
@@ -36,7 +36,7 @@ class MapperModelTest {
     @Test
     fun testMappingFullConstructorWithAnnotations() {
         val origin = getMockAnnotated()
-        val destination = mapperModel.map(origin, DestinationRecordClass::class)
+        val destination = kMapper.map(origin, DestinationRecordClass::class)
 
         assertEquals(origin.string, destination.testString)
         assertEquals(origin.int, destination.testInt)
@@ -56,11 +56,11 @@ class MapperModelTest {
     }
 
     data class OriginalAnnotatedClass(
-        @property:MapperModelField(destinationField = "testString", destinationClass = "EmptyConstructorClass")
-        @property:MapperModelField(destinationField = "testString", destinationClass = "DestinationRecordClass")
+        @property:KMappedField(destinationField = "testString", destinationClass = "EmptyConstructorClass")
+        @property:KMappedField(destinationField = "testString", destinationClass = "DestinationRecordClass")
         val string: String,
-        @property:MapperModelField(destinationField = "testInt", destinationClass = "EmptyConstructorClass")
-        @property:MapperModelField(destinationField = "testInt", destinationClass = "DestinationRecordClass")
+        @property:KMappedField(destinationField = "testInt", destinationClass = "EmptyConstructorClass")
+        @property:KMappedField(destinationField = "testInt", destinationClass = "DestinationRecordClass")
         val int: Int
     )
 

@@ -2,7 +2,7 @@
 
 ### It functions just like the ModelMapper framework for Java, if the fields have the same name, they'll be automatically converted.
 
-### If the fields have different names, you must specify their destiny class (simple name) and their name on that class, using the MapperModelField annotation.
+### If the fields have different names, you must specify their destiny class (simple name) and their name on that class, using the KMappedField annotation.
 
 # Sample Usage
 
@@ -10,9 +10,9 @@
 
 ```kotlin
 data class Car(
-    @property:MapperModelField(destinationField = "id", destinationClass = "TargetCar")
+    @property:KMappedField(destinationField = "id", destinationClass = "TargetCar")
     var name: String? = null,
-    @property:MapperModelField(destinationField = "horsePower", destinationClass = "TargetCar")
+    @property:KMappedField(destinationField = "horsePower", destinationClass = "TargetCar")
     val hp: Int
 )
 ```
@@ -30,7 +30,7 @@ class TargetCar() {
 
 ```kotlin
 val from = Car("Jetta", 216)
-val mapped = ModelMapper().map(from, TargetCar::class)
+val mapped = KMapper().map(from, TargetCar::class)
 ```
 
 ## Field Conversion Strategies
@@ -39,9 +39,9 @@ val mapped = ModelMapper().map(from, TargetCar::class)
 
 ```kotlin
 
-var model: MapperModel()
+var mapper: org.kmapper.KMapper()
 
-model.converters.addConverter(
+mapper.converters.addConverter(
     OriginClass::class, DestinyClass::class
 ) { from ->
     from as OriginClass
@@ -60,6 +60,6 @@ model.converters.addConverter(
 
 # How it works
 
-### Both the target and the origin classes have their fields introspected via reflection, then the fields are converted using the registered converters (which are saved in the mapper.converters.Converters class).
+### Both the target and the origin classes have their fields introspected via reflection, then the fields are converted using the registered converters (which are saved in the org.kmapper.converters.Converters class).
 
 ### The primary constructor of the destiny class is then called, and after that, all of its mutable fields are injected with the values of the original object via reflection.

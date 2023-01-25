@@ -6,7 +6,7 @@ import kotlin.reflect.KMutableProperty
 import kotlin.reflect.KType
 import kotlin.reflect.full.*
 
-class MapperModel {
+class KMapper {
 
     val converters = Converters()
 
@@ -30,8 +30,8 @@ class MapperModel {
 
         to::class.declaredMemberProperties
             .forEach { m ->
-                val ann: MapperModelField? =
-                    m.findAnnotations<MapperModelField>()
+                val ann: KMappedField? =
+                    m.findAnnotations<KMappedField>()
                         .firstOrNull { ann -> ann.destinationClass == cls.simpleName }
                 val nameToPut = ann?.destinationField ?: m.name
                 mapOfProps[nameToPut] = m.getter.call(to)

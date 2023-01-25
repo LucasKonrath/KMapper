@@ -6,4 +6,4 @@ package org.kmapper
 /**
  * Annotation used to mark the destination field and class of the property to be converted.
  */
-annotation class MapperModelField(val destinationField: String, val destinationClass: String)
+annotation class KMappedField(val destinationField: String, val destinationClass: String)
