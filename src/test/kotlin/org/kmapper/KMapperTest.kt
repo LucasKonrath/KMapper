@@ -1,22 +1,42 @@
 package org.kmapper
 
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.RepeatedTest
 import org.junit.jupiter.api.Test
+import kotlin.system.measureNanoTime
+import kotlin.system.measureTimeMillis
 
 class KMapperTest {
 
     private val kMapper = KMapper()
 
-    @Test
+    @RepeatedTest(10)
     fun testMappingEmptyConstructorWithoutAnnotations() {
-        val origin = getMock()
-        val emptyConstructorClass = kMapper.map(origin, EmptyConstructorClass::class)
 
-        assertEquals(origin.testString, emptyConstructorClass.testString)
-        assertEquals(origin.testInt, emptyConstructorClass.testInt)
+        val origin = getMock()
+
+        val time = measureNanoTime{
+            val emptyConstructorClass = kMapper.map(origin, EmptyConstructorClass::class)
+        }
+
+        val originalTime = measureNanoTime {
+            val empty = EmptyConstructorClass()
+            empty.testInt = origin.testInt
+            empty.testString = origin.testString
+         }
+
+         println("Reflection $time")
+         println("Original $originalTime")
+
+        val cachedTime = measureNanoTime {
+            val emptyConstructorClass = kMapper.map(origin, EmptyConstructorClass::class)
+        }
+
+        println("Cached time $cachedTime")
+
     }
 
-    @Test
+    @RepeatedTest(10)
     fun testMappingEmptyConstructorWithAnnotations() {
         val origin = getMockAnnotated()
         val emptyConstructorClass = kMapper.map(origin, EmptyConstructorClass::class)
@@ -24,7 +44,7 @@ class KMapperTest {
         assertEquals(origin.int, emptyConstructorClass.testInt)
     }
 
-    @Test
+    @RepeatedTest(10)
     fun testMappingFullConstructorWithoutAnnotations() {
         val origin = OriginalClass(testString = "Test String", testInt = 4444)
         val destination = kMapper.map(origin, DestinationRecordClass::class)
@@ -33,7 +53,7 @@ class KMapperTest {
         assertEquals(origin.testInt, destination.testInt)
     }
 
-    @Test
+    @RepeatedTest(10)
     fun testMappingFullConstructorWithAnnotations() {
         val origin = getMockAnnotated()
         val destination = kMapper.map(origin, DestinationRecordClass::class)
@@ -56,11 +76,9 @@ class KMapperTest {
     }
 
     data class OriginalAnnotatedClass(
-        @property:KMappedField(destinationField = "testString", destinationClass = "EmptyConstructorClass")
-        @property:KMappedField(destinationField = "testString", destinationClass = "DestinationRecordClass")
+        @property:KMappedField(destinationField = "testString")
         val string: String,
-        @property:KMappedField(destinationField = "testInt", destinationClass = "EmptyConstructorClass")
-        @property:KMappedField(destinationField = "testInt", destinationClass = "DestinationRecordClass")
+        @property:KMappedField(destinationField = "testInt")
         val int: Int
     )
 

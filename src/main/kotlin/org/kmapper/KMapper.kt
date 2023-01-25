@@ -1,14 +1,14 @@
 package org.kmapper
 
+import org.kmapper.cache.TimedCache
 import org.kmapper.converters.Converters
-import kotlin.reflect.KClass
-import kotlin.reflect.KMutableProperty
-import kotlin.reflect.KType
+import kotlin.reflect.*
 import kotlin.reflect.full.*
 
 class KMapper {
 
     val converters = Converters()
+    val cache = TimedCache()
 
     /**
      * Function called to convert an instance of an object to an instance of the specified KClass.
@@ -28,14 +28,12 @@ class KMapper {
         var newObject: T? = null
         val mapOfProps = mutableMapOf<String?, Any?>()
 
-        to::class.declaredMemberProperties
+        getDeclaredMemberProperties(to::class)
             .forEach { m ->
                 val ann: KMappedField? =
-                    m.findAnnotations<KMappedField>()
-                        .firstOrNull { ann -> ann.destinationClass == cls.simpleName }
+                    m.findAnnotation<KMappedField>()
                 val nameToPut = ann?.destinationField ?: m.name
                 mapOfProps[nameToPut] = m.getter.call(to)
-
             }
 
         if (emptyConstructor == true) {
@@ -43,14 +41,14 @@ class KMapper {
         } else {
 
             val args =
-                cls.primaryConstructor?.parameters?.map { param -> convert(mapOfProps[param.name]!!, param.type) }
+                getPrimaryConstructor(cls)?.parameters?.map { param -> convert(mapOfProps[param.name]!!, param.type) }
                     ?.toTypedArray()
                     .orEmpty()
 
-            newObject = cls.primaryConstructor?.call(*args)
+            newObject = getPrimaryConstructor(cls)?.call(*args) as T?
         }
 
-        cls.declaredMemberProperties.forEach { m ->
+        getDeclaredMemberProperties(cls).forEach { m ->
             if (m is KMutableProperty<*>) {
                 m.setter.call(
                     newObject,
@@ -62,6 +60,30 @@ class KMapper {
         return newObject!!
     }
 
+    fun getDeclaredMemberProperties(clazz: KClass<*>): Collection<KProperty1<*, *>> {
+         val cached = cache.get(clazz.simpleName!!)
+         if(cached != null){
+            return cached as Collection<KProperty1<*, *>>
+         } else {
+            val toReturn = clazz.declaredMemberProperties
+            cache.put(clazz.simpleName!!, toReturn)
+            cache.get("OriginalClass")
+            return toReturn
+         }
+    }
+
+    fun getPrimaryConstructor(clazz: KClass<*>): KFunction<Any>? {
+        val cached = cache.get(clazz.simpleName!!+"Constructor")
+        if(cached != null){
+            return cached as KFunction<Any>
+        } else {
+            val toReturn = clazz.primaryConstructor
+            if (toReturn != null) {
+                cache.put(clazz.simpleName!!+"Constructor", toReturn)
+            }
+            return toReturn
+        }
+    }
     private fun convert(from: Any, to: KType): Any {
         val typeClassifier = from::class.createType().classifier
         val toClassifier = to.classifier
