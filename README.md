@@ -63,3 +63,10 @@ mapper.converters.addConverter(
 ### Both the target and the origin classes have their fields introspected via reflection, then the fields are converted using the registered converters (which are saved in the org.kmapper.converters.Converters class).
 
 ### The primary constructor of the destiny class is then called, and after that, all of its mutable fields are injected with the values of the original object via reflection.
+
+### When an KClass has its declaredMemberProperties loaded via reflection, an in-memory cache is created to speed up future invocations. By default, this cache has 15 minutes of TTL. At this current release, you can't customize this TTL, but it will be possible in the future. This cache is unique per instance of KMapper().
+
+# Performance
+
+## You can see the performance Tests and Results on this repo: https://github.com/LucasKonrath/KMapper-Perfomance-Tests, which uses JMH for benchmarks.
+## It will always be kept up to date with the latest KMapper version released.
