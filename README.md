@@ -68,4 +68,4 @@ mapper.map(...
 
 # Performance
 
-## You can see the performance Tests and Results on this repo: https://github.com/LucasKonrath/KMapper-Perfomance-Tests, which uses JMH for benchmarks. It will always be kept up to date with the latest KMapper version released.
+### You can see the performance Tests and Results on this repo: https://github.com/LucasKonrath/KMapper-Perfomance-Tests, which uses JMH for benchmarks. It will always be kept up to date with the latest KMapper version released.
