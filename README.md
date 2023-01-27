@@ -4,7 +4,7 @@
 
 # Sample Usage
 
-# Origin class with the mappings declared. If they aren't declared in the annotation, mapping will be done by name (it will map to the same fieldName on the destination class). Else, field will be mapped to the value present on the destinationField property of the annotation.
+> Origin class with the mappings declared. If they aren't declared in the annotation, mapping will be done by name (it will map to the same fieldName on the destination class). Else, field will be mapped to the value present on the destinationField property of the annotation.
 
 ```kotlin
 data class Car(
@@ -32,7 +32,7 @@ val mapped = KMapper().map(from, TargetCar::class)
 
 ## Field Conversion Strategies
 
-### If you want to add a custom field conversion strategy, in addition to the default ones provided, you can do so in the following Manner:
+> If you want to add a custom field conversion strategy, in addition to the default ones provided, you can do so in the following Manner:
 
 ```kotlin
 
@@ -68,5 +68,4 @@ mapper.map(...
 
 # Performance
 
-## You can see the performance Tests and Results on this repo: https://github.com/LucasKonrath/KMapper-Perfomance-Tests, which uses JMH for benchmarks.
-## It will always be kept up to date with the latest KMapper version released.
+## You can see the performance Tests and Results on this repo: https://github.com/LucasKonrath/KMapper-Perfomance-Tests, which uses JMH for benchmarks. It will always be kept up to date with the latest KMapper version released.
