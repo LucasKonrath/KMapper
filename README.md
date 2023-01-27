@@ -1,8 +1,6 @@
 # This is a framework for converting Kotlin objects seamslessly.
 
-### It functions just like the ModelMapper framework for Java, if the fields have the same name, they'll be automatically converted.
-
-### If the fields have different names, you must specify their destiny class (simple name) and their name on that class, using the KMappedField annotation.
+### This framework functions pretty similarly to the ModelMapper framework on Java, but for dealing straight with Kotlin classes. This is a framework based on reflection, so for the first execution of a determinate class model, it tends to be slower, however, due to caching mechanisms on this framework, for repeated transformations it has excellent perfomance. More about performance can be found at the bottom of this page.
 
 # Sample Usage
 
