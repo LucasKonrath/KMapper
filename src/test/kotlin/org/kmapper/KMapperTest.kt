@@ -62,6 +62,27 @@ class KMapperTest {
         assertEquals(origin.int, destination.testInt)
     }
 
+
+    @Test
+    fun testConvertStringToPair() {
+
+        val obj = StringClass("First, Second")
+
+        kMapper.converters.addConverter(
+            String::class,
+            Pair::class
+        ){
+            from ->
+                from as String
+                val first = from.split(",").first()
+                val second = from.split(",")[1]
+                Pair(first, second)
+        }
+
+        val to: PairClass = kMapper.map(obj, cls = PairClass::class)
+        println("$to")
+    }
+
     fun getMock(): OriginalClass {
         return OriginalClass(testString = "Test String", testInt = 4444)
     }
@@ -89,4 +110,7 @@ class KMapperTest {
 
     data class DestinationRecordClass(val testString: String, val testInt: Int)
 
+    data class StringClass(val value: String)
+
+    data class PairClass(val value: Pair<*, *>)
 }
