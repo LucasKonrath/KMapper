@@ -1,6 +1,6 @@
 # This is a framework for converting Kotlin objects seamslessly.
 
-### This framework functions pretty similarly to the ModelMapper framework on Java, but for dealing straight with Kotlin classes. This is a framework based on reflection, so for the first execution of a determinate class model, it tends to be slower, however, due to caching mechanisms on this framework, for repeated transformations it has excellent perfomance. More about performance can be found at the bottom of this page.
+### This framework was based on the ModelMapper framework for Java, but for dealing straight with Kotlin classes. This is a framework based on reflection, so for the first execution of a determinate class model, it is substantially slower, however, due to caching mechanisms, for repeated transformations it has good perfomance. More about performance can be found at the bottom of this page.
 
 # Sample Usage
 
