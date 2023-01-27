@@ -6,13 +6,12 @@
 
 # Sample Usage
 
-# Origin class with the mappings declared. If they aren't declared in the annotation, mapping will be done by name.
+# Origin class with the mappings declared. If they aren't declared in the annotation, mapping will be done by name (it will map to the same fieldName on the destination class). Else, field will be mapped to the value present on the destinationField property of the annotation.
 
 ```kotlin
 data class Car(
-    @property:KMappedField(destinationField = "id", destinationClass = "TargetCar")
     var name: String? = null,
-    @property:KMappedField(destinationField = "horsePower", destinationClass = "TargetCar")
+    @property:KMappedField(destinationField = "horsePower")
     val hp: Int
 )
 ```
@@ -21,7 +20,7 @@ data class Car(
 
 ```kotlin
 class TargetCar() {
-    var id: Int? = null
+    var name: String? = null
     var horsePower: Double? = null
 }
 ```
@@ -48,6 +47,9 @@ mapper.converters.addConverter(
     DestinyClass.valueOf(from)
     //using DestinyClass as an Enum for this example
 }
+
+// then convert your objects
+mapper.map(...
 ```
 
 ### Default Conversions Mapped:
@@ -64,7 +66,7 @@ mapper.converters.addConverter(
 
 ### The primary constructor of the destiny class is then called, and after that, all of its mutable fields are injected with the values of the original object via reflection.
 
-### When an KClass has its declaredMemberProperties loaded via reflection, an in-memory cache is created to speed up future invocations. By default, this cache has 15 minutes of TTL. At this current release, you can't customize this TTL, but it will be possible in the future. This cache is unique per instance of KMapper().
+### When an KClass has its declaredMemberProperties loaded via reflection, an in-memory cache is created to speed up future invocations, by using a HashMap implementation. By default, this cache has 15 minutes of TTL. At this current release, you can't customize this TTL, but it will be possible in the future. This cache is unique per instance of KMapper().
 
 # Performance
 
