@@ -2,8 +2,10 @@ package org.kmapper
 
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import org.kmapper.testClasses.EmptyConstructorClass
+import org.kmapper.testClasses.OriginalClass
 
-class KMapperTest {
+public class KMapperTest {
 
     private val kMapper = KMapper()
 
@@ -46,11 +48,6 @@ class KMapperTest {
         return OriginalClass(testString = "Test String", testInt = 4444)
     }
 
-    data class OriginalClass(
-        val testString: String,
-        val testInt: Int
-    )
-
     fun getMockAnnotated(): OriginalAnnotatedClass {
         return OriginalAnnotatedClass(string = "Test String", int = 4444)
     }
@@ -63,11 +60,6 @@ class KMapperTest {
         @property:KMappedField(destinationField = "testInt", destinationClass = "DestinationRecordClass")
         val int: Int
     )
-
-    class EmptyConstructorClass {
-        var testString: String? = null
-        var testInt: Int? = null
-    }
 
     data class DestinationRecordClass(val testString: String, val testInt: Int)
 

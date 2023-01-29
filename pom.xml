@@ -97,6 +97,11 @@
             <artifactId>kotlin-reflect</artifactId>
             <version>1.7.21</version>
         </dependency>
+        <dependency>
+            <groupId>com.squareup</groupId>
+            <artifactId>kotlinpoet</artifactId>
+            <version>1.12.0</version>
+        </dependency>
     </dependencies>
 
 </project>
