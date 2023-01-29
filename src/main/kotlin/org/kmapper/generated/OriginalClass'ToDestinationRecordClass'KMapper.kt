@@ -4,19 +4,17 @@ import kotlin.Any
 import kotlin.reflect.KClassifier
 import org.kmapper.IKMapper
 import org.kmapper.converters.Converters
-import org.kmapper.testClasses.EmptyConstructorClass
+import org.kmapper.testClasses.DestinationRecordClass
 import org.kmapper.testClasses.OriginalClass
 
-public class `OriginalClass'ToEmptyConstructorClass'KMapper`(
+public class `OriginalClass'ToDestinationRecordClass'KMapper`(
   private val from: OriginalClass,
 ) : IKMapper {
-  public fun constructClass(): EmptyConstructorClass = EmptyConstructorClass()
+  public fun constructClass(): DestinationRecordClass = DestinationRecordClass( from.testString,
+      from.testInt )
 
-  public override fun map(): EmptyConstructorClass {
+  public override fun map(): DestinationRecordClass {
     val to = constructClass()
-    to.testInt = convert(from.testInt, from.testInt!!::class, kotlin.Int::class) as kotlin.Int?
-    to.testString = convert(from.testString, from.testString!!::class, kotlin.String::class) as
-        kotlin.String?
     return to
   }
 

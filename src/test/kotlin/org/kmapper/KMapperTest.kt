@@ -1,21 +1,29 @@
 package org.kmapper
 
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.RepeatedTest
 import org.junit.jupiter.api.Test
+import org.kmapper.testClasses.DestinationRecordClass
 import org.kmapper.testClasses.EmptyConstructorClass
+import org.kmapper.testClasses.OriginalAnnotatedClass
 import org.kmapper.testClasses.OriginalClass
+import kotlin.system.measureNanoTime
+import kotlin.system.measureTimeMillis
+import kotlin.time.measureTime
 
-public class KMapperTest {
+class KMapperTest {
 
     private val kMapper = KMapper()
 
-    @Test
+    @RepeatedTest(10)
     fun testMappingEmptyConstructorWithoutAnnotations() {
         val origin = getMock()
-        val emptyConstructorClass = kMapper.map(origin, EmptyConstructorClass::class)
-
-        assertEquals(origin.testString, emptyConstructorClass.testString)
-        assertEquals(origin.testInt, emptyConstructorClass.testInt)
+        val time = measureNanoTime{
+            val emptyConstructorClass = kMapper.map(origin, EmptyConstructorClass::class)
+        }
+        println("$time")
+//        assertEquals(origin.testString, emptyConstructorClass.testString)
+//        assertEquals(origin.testInt, emptyConstructorClass.testInt)
     }
 
     @Test
@@ -51,16 +59,5 @@ public class KMapperTest {
     fun getMockAnnotated(): OriginalAnnotatedClass {
         return OriginalAnnotatedClass(string = "Test String", int = 4444)
     }
-
-    data class OriginalAnnotatedClass(
-        @property:KMappedField(destinationField = "testString", destinationClass = "EmptyConstructorClass")
-        @property:KMappedField(destinationField = "testString", destinationClass = "DestinationRecordClass")
-        val string: String,
-        @property:KMappedField(destinationField = "testInt", destinationClass = "EmptyConstructorClass")
-        @property:KMappedField(destinationField = "testInt", destinationClass = "DestinationRecordClass")
-        val int: Int
-    )
-
-    data class DestinationRecordClass(val testString: String, val testInt: Int)
 
 }

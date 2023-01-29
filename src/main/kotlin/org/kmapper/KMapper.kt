@@ -25,6 +25,14 @@ class KMapper {
      */
     fun <T : Any> map(from: Any, toCls: KClass<T>): T {
 
+        try{
+            val clas = Class.forName("org.kmapper.generated." + getClaszName(from, toCls)).kotlin
+            val impl = clas.primaryConstructor?.call(from) as IKMapper
+            return impl.map() as T
+        } catch (e: Exception){
+            println("Proceeding to class creation: $e")
+        }
+
         val emptyConstructor: Boolean? = toCls.primaryConstructor?.parameters?.isEmpty()
 
         var newObject: T? = null
@@ -32,6 +40,7 @@ class KMapper {
         val nameMappings = mutableMapOf<String?, String?>()
         val fileSpec = FileSpec.builder("org.kmapper.generated", getClaszName(from, toCls))
         val clasz = TypeSpec.classBuilder(getClaszName(from, toCls))
+        clasz.addSuperinterface(IKMapper::class)
 
         val constructor = FunSpec.constructorBuilder()
         constructor.addParameter("from", from::class)
@@ -61,8 +70,10 @@ class KMapper {
                     , param.type.classifier!!) }
                     ?.toTypedArray()
                     .orEmpty()
-//
-//            constructClass.addStatement("return %P( %P )", toCls.simpleName!!)
+
+            val accessors = toCls.primaryConstructor?.parameters?.map { param -> "from." + nameMappings[param.name] }
+
+            constructClass.addStatement("return %L( %L )", toCls.simpleName!!, accessors!!.joinToString(", "))
 
             newObject = toCls.primaryConstructor?.call(*args)
         }
@@ -83,12 +94,15 @@ class KMapper {
 
         val mappingMethod = FunSpec.builder("map")
                 .returns(toCls)
+            .addModifiers(KModifier.OVERRIDE)
                 .addStatement("val to = constructClass()")
 
 
         toCls.declaredMemberProperties.forEach { m ->
             if (m is KMutableProperty<*>) {
-                mappingMethod.addStatement("to.%L = convert(from.%L, %L, %L)", nameMappings[m.name]!!, m.name, nameMappings[m.name]!!::class.createType().classifier!!, m.returnType.classifier!!)
+                mappingMethod.addStatement("to.%L = convert(from.%L, from.%L!!::class, %L::class) as %L",  m.name, nameMappings[m.name]!!, nameMappings[m.name]!!,
+                    m.returnType!!.toString().replace("?", "")
+                    , m.returnType)
                 m.setter.call(
                     newObject,
                     convert(mapOfProps[m.name]!!, mapOfProps[m.name]!!::class, m.returnType.classifier!!)
@@ -122,7 +136,7 @@ class KMapper {
     }
 
 
-    public fun convert(from: Any, typeClassifier: KClassifier, toClassifier: KClassifier): Any {
+     fun convert(from: Any, typeClassifier: KClassifier, toClassifier: KClassifier): Any {
         return Converters().getConverter(typeClassifier, toClassifier)?.invoke(from)!!
     }
 }
