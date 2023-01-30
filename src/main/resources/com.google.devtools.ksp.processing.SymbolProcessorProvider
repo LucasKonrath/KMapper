@@ -1,0 +1,7 @@
+// Create the directories: yourmodule/src/main/resources/META-INF/services/
+// Create a file named com.google.devtools.ksp.processing.SymbolProcessorProvider
+// Inside the file, add the following line (and nothing more):
+com.snaky.ksp.processor.provider.ListedProcessorProvider
+
+// For a reference, you can check out here:
+// https://github.com/adibfara/ListGen/blob/main/ksp/src/main/resources/META-INF/services/com.google.devtools.ksp.processing.SymbolProcessorProvider
