@@ -62,4 +62,4 @@ mapper.converters.addConverter(
 
 ### Both the target and the origin classes have their fields introspected via reflection, then the fields are converted using the registered converters (which are saved in the org.kmapper.converters.Converters class).
 
-### The primary constructor of the destiny class is then called, and after that, all of its mutable fields are injected with the values of the original object via reflection.
+### The code for the Mapper is then generated using KotlinPoet, that code is compiled using KotlinScript and then the generated class is cached for faster access.

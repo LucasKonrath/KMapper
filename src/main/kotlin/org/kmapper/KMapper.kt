@@ -1,16 +1,19 @@
 package org.kmapper
 
 import com.squareup.kotlinpoet.*
+import org.jetbrains.kotlin.cli.common.environment.setIdeaIoUseFallback
 import org.kmapper.converters.Converters
+import javax.script.ScriptEngine
+import javax.script.ScriptEngineManager
 import kotlin.reflect.KClass
 import kotlin.reflect.KClassifier
 import kotlin.reflect.KMutableProperty
-import kotlin.reflect.KType
 import kotlin.reflect.full.*
 
 class KMapper {
 
     val converters = Converters()
+    private val cache = TimedCache()
 
     /**
      * Function called to convert an instance of an object to an instance of the specified KClass.
@@ -26,18 +29,21 @@ class KMapper {
     fun <T : Any> map(from: Any, toCls: KClass<T>): T {
 
         try{
-            val clas = Class.forName("org.kmapper.generated." + getClaszName(from, toCls)).kotlin
-            val impl = clas.primaryConstructor?.call(from) as IKMapper
-            return impl.map() as T
+            val clas = cache.get(getClaszName(from, toCls))
+            val constructor = (clas as KClass<*>).primaryConstructor
+            val instance = constructor!!.call(from)
+            val mapper = instance as IKMapper
+            return mapper.map() as T
         } catch (e: Exception){
             println("Proceeding to class creation: $e")
         }
 
-        val emptyConstructor: Boolean? = toCls.primaryConstructor?.parameters?.isEmpty()
-
-        var newObject: T? = null
         val mapOfProps = mutableMapOf<String?, Any?>()
         val nameMappings = mutableMapOf<String?, String?>()
+
+        val emptyConstructor: Boolean? = toCls.primaryConstructor?.parameters?.isEmpty()
+
+        /** Build the base class with the constructor and the interface IKMapper **/
         val fileSpec = FileSpec.builder("org.kmapper.generated", getClaszName(from, toCls))
         val clasz = TypeSpec.classBuilder(getClaszName(from, toCls))
         clasz.addSuperinterface(IKMapper::class)
@@ -60,28 +66,12 @@ class KMapper {
             .returns(toCls)
 
         if (emptyConstructor == true) {
-            newObject = toCls.createInstance()
             constructClass
                 .addStatement("return %T()", toCls)
         } else {
-
-            val args =
-                toCls.primaryConstructor?.parameters?.map { param -> convert(mapOfProps[param.name]!!, mapOfProps[param.name]!!::class
-                    , param.type.classifier!!) }
-                    ?.toTypedArray()
-                    .orEmpty()
-
             val accessors = toCls.primaryConstructor?.parameters?.map { param -> "from." + nameMappings[param.name] }
-
             constructClass.addStatement("return %L( %L )", toCls.simpleName!!, accessors!!.joinToString(", "))
-
-            newObject = toCls.primaryConstructor?.call(*args)
         }
-
-//        to::class.primaryConstructor?.parameters?.forEach {
-//           param ->
-//                constructor.addParameter(param.name!!, param.type.jvmErasure)
-//        }
 
         clasz.primaryConstructor(constructor.build())
             .addProperty(PropertySpec.builder(
@@ -103,10 +93,6 @@ class KMapper {
                 mappingMethod.addStatement("to.%L = convert(from.%L, from.%L!!::class, %L::class) as %L",  m.name, nameMappings[m.name]!!, nameMappings[m.name]!!,
                     m.returnType!!.toString().replace("?", "")
                     , m.returnType)
-                m.setter.call(
-                    newObject,
-                    convert(mapOfProps[m.name]!!, mapOfProps[m.name]!!::class, m.returnType.classifier!!)
-                )
             }
         }
 
@@ -122,21 +108,30 @@ class KMapper {
             .addStatement("return %T().getConverter(typeClassifier, toClassifier)?.invoke(from)!!", Converters::class)
 
         clasz.addFunction(convertFunction.build())
-
         fileSpec.addType(clasz.build())
-        FileWriter().saveFile(fileSpec.build())
 
-        return newObject!!
+        val classLoader = Thread.currentThread().contextClassLoader
+
+        /** Load class from KotlinScript engine manager. **/
+        setIdeaIoUseFallback()
+        val engineManager = ScriptEngineManager(classLoader)
+        val ktsEngine: ScriptEngine = engineManager.getEngineByExtension("kts")
+         val compiledClasz = ktsEngine.eval(fileSpec.build().toString() + "\n" + getClaszName(from, toCls) + "::class")
+
+
+        /** Save compiled class on a cache for faster access on future iterations **/
+        cache.put(getClaszName(from, toCls), compiledClasz)
+
+        /** Get the constructor for the compiled class, instantiate it and call the map method. **/
+        val construc = (compiledClasz as KClass<*>).primaryConstructor
+        val instance = construc!!.call(from)
+        val mapper = instance as IKMapper
+        return mapper.map() as T
     }
 
     fun getClaszName(to: Any, cls: KClass<*>): String {
         val toClass = to::class.simpleName
         val clsName = cls.simpleName
-        return "$toClass'To$clsName'KMapper"
-    }
-
-
-     fun convert(from: Any, typeClassifier: KClassifier, toClassifier: KClassifier): Any {
-        return Converters().getConverter(typeClassifier, toClassifier)?.invoke(from)!!
+        return "$toClass" + "To" + "$clsName" + "KMapper"
     }
 }

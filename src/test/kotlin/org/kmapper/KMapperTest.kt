@@ -15,15 +15,20 @@ class KMapperTest {
 
     private val kMapper = KMapper()
 
-    @RepeatedTest(10)
+    @Test
     fun testMappingEmptyConstructorWithoutAnnotations() {
         val origin = getMock()
-        val time = measureNanoTime{
+
+        val time = measureTimeMillis {
             val emptyConstructorClass = kMapper.map(origin, EmptyConstructorClass::class)
         }
-        println("$time")
-//        assertEquals(origin.testString, emptyConstructorClass.testString)
-//        assertEquals(origin.testInt, emptyConstructorClass.testInt)
+        println("Non-cache time: $time")
+
+        val time2 = measureTimeMillis {
+            val secondOne =  kMapper.map(origin, EmptyConstructorClass::class)
+        }
+
+        println("Time cached: $time2")
     }
 
     @Test

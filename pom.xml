@@ -15,10 +15,16 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <kotlin.code.style>official</kotlin.code.style>
         <kotlin.compiler.jvmTarget>1.8</kotlin.compiler.jvmTarget>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
 
 
     <repositories>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
         <repository>
             <id>jitpack.io</id>
             <url>https://jitpack.io</url>
@@ -105,17 +111,30 @@
             <version>1.7.21</version>
         </dependency>
         <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-scripting-jsr223</artifactId>
+            <version>1.7.21</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-script-util</artifactId>
+            <version>1.7.21</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-compiler-embeddable</artifactId>
+            <version>1.7.21</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-scripting-jvm-host</artifactId>
+            <version>1.7.21</version>
+        </dependency>
+        <dependency>
             <groupId>com.squareup</groupId>
             <artifactId>kotlinpoet</artifactId>
             <version>1.12.0</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/com.google.devtools.ksp/symbol-processing-api -->
-        <dependency>
-            <groupId>com.google.devtools.ksp</groupId>
-            <artifactId>symbol-processing-api</artifactId>
-            <version>1.7.21-1.0.8</version>
-        </dependency>
-
     </dependencies>
 
 </project>
