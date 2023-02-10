@@ -7,6 +7,7 @@ import javax.script.ScriptEngine
 import javax.script.ScriptEngineManager
 import kotlin.reflect.KClass
 import kotlin.reflect.KClassifier
+import kotlin.reflect.KFunction
 import kotlin.reflect.KMutableProperty
 import kotlin.reflect.full.*
 
@@ -29,8 +30,7 @@ class KMapper {
     fun <T : Any> map(from: Any, toCls: KClass<T>): T {
 
         try{
-            val clas = cache.get(getClaszName(from, toCls))
-            val constructor = (clas as KClass<*>).primaryConstructor
+            val constructor: KFunction<*>? = cache.get(getClaszName(from, toCls)) as KFunction<*>?
             val instance = constructor!!.call(from)
             val mapper = instance as IKMapper
             return mapper.map() as T
@@ -54,8 +54,7 @@ class KMapper {
         from::class.declaredMemberProperties
             .forEach { m ->
                 val ann: KMappedField? =
-                    m.findAnnotations<KMappedField>()
-                        .firstOrNull { ann -> ann.destinationClass == toCls.simpleName }
+                    m.findAnnotation<KMappedField>()
                 val nameToPut = ann?.destinationField ?: m.name
                 mapOfProps[nameToPut] = m.getter.call(from)
                 nameMappings[nameToPut] = m.name
@@ -119,11 +118,10 @@ class KMapper {
          val compiledClasz = ktsEngine.eval(fileSpec.build().toString() + "\n" + getClaszName(from, toCls) + "::class")
 
 
-        /** Save compiled class on a cache for faster access on future iterations **/
-        cache.put(getClaszName(from, toCls), compiledClasz)
-
         /** Get the constructor for the compiled class, instantiate it and call the map method. **/
         val construc = (compiledClasz as KClass<*>).primaryConstructor
+
+        cache.put(getClaszName(from, toCls), construc!!)
         val instance = construc!!.call(from)
         val mapper = instance as IKMapper
         return mapper.map() as T

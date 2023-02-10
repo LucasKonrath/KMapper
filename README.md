@@ -10,9 +10,9 @@
 
 ```kotlin
 data class Car(
-    @property:KMappedField(destinationField = "id", destinationClass = "TargetCar")
+    @property:KMappedField(destinationField = "id")
     var name: String? = null,
-    @property:KMappedField(destinationField = "horsePower", destinationClass = "TargetCar")
+    @property:KMappedField(destinationField = "horsePower")
     val hp: Int
 )
 ```
