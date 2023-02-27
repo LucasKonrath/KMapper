@@ -3,10 +3,8 @@ package org.kmapper
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.RepeatedTest
 import org.junit.jupiter.api.Test
-import org.kmapper.testClasses.DestinationRecordClass
-import org.kmapper.testClasses.EmptyConstructorClass
-import org.kmapper.testClasses.OriginalAnnotatedClass
-import org.kmapper.testClasses.OriginalClass
+import org.kmapper.converters.Converters
+import org.kmapper.testClasses.*
 import kotlin.system.measureNanoTime
 import kotlin.system.measureTimeMillis
 import kotlin.time.measureTime
@@ -55,6 +53,29 @@ class KMapperTest {
 
         assertEquals(origin.string, destination.testString)
         assertEquals(origin.int, destination.testInt)
+    }
+
+    @Test
+    fun testMappingDestinationClassFromOriginClass() {
+        val from = OriginClass(10, "10", 10.0, 10, 10)
+        val to = kMapper.map(from, OriginalClass::class)
+        assertEquals(from.int, to.testInt)
+        assertEquals(from.string, to.testString)
+    }
+
+    @Test
+    fun testCustomConversion(){
+        val from = OriginalClass("TEST", 10)
+        val converters = Converters()
+        converters.addConverter(
+            String::class, TestEnum::class
+        ) { param ->
+            param as String
+            TestEnum.valueOf(param)
+            //using TestEnum as an Enum for this example
+        }
+        val to = kMapper.map(from, TestEnumDestinationClass::class, converters = converters)
+        assertEquals(from.testString, to.testString.toString())
     }
 
     fun getMock(): OriginalClass {
