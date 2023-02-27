@@ -68,7 +68,10 @@ class KMapper {
             constructClass
                 .addStatement("return %T()", toCls)
         } else {
-            val accessors = toCls.primaryConstructor?.parameters?.map { param -> "from." + nameMappings[param.name] }
+            val accessors = toCls.primaryConstructor?.parameters?.map { param ->
+                val fieldName = "from." + nameMappings[param.name]
+                "convert($fieldName, $fieldName!!::class, ${param.type}::class) as ${param.type}"
+            }
             constructClass.addStatement("return %L( %L )", toCls.simpleName!!, accessors!!.joinToString(", "))
         }
 
@@ -115,7 +118,7 @@ class KMapper {
         setIdeaIoUseFallback()
         val engineManager = ScriptEngineManager(classLoader)
         val ktsEngine: ScriptEngine = engineManager.getEngineByExtension("kts")
-         val compiledClasz = ktsEngine.eval(fileSpec.build().toString() + "\n" + getClaszName(from, toCls) + "::class")
+        val compiledClasz = ktsEngine.eval(fileSpec.build().toString() + "\n" + getClaszName(from, toCls) + "::class")
 
 
         /** Get the constructor for the compiled class, instantiate it and call the map method. **/
